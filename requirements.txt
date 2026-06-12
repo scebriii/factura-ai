@@ -1,0 +1,16 @@
+# === Dependencias del proyecto ===
+# FastAPI: el framework web (como Express en JS, pero para Python)
+fastapi
+# Uvicorn: el servidor que ejecuta FastAPI (como nodemon)
+uvicorn
+# python-multipart: permite recibir archivos subidos (PDFs)
+python-multipart
+# PyMuPDF: lee PDFs y extrae el texto que contienen
+pymupdf
+# openai: SDK oficial para llamar a la API de OpenAI
+openai
+# python-dotenv: carga variables de entorno desde .env (para la API key)
+python-dotenv
+# pytest: framework de tests + httpx: cliente HTTP que usa TestClient de FastAPI
+pytest
+httpx

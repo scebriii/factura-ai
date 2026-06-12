@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FacturaAI - Extraccion inteligente de datos de facturas con IA. Sube un PDF y obtén datos estructurados al instante.">
+    <title>FacturaAI — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- HEADER                                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+            </div>
+            <span class="header-brand" style="text-wrap: balance">Factura<strong>AI</strong></span>
+        </div>
+        <div class="header-center">
+            <div class="api-key-group">
+                <svg class="api-key-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                <input type="password" id="api-key-input" class="api-key-input" placeholder="API Key..." autocomplete="off" spellcheck="false">
+                <button id="toggle-key" class="btn-ghost" title="Mostrar / ocultar clave" type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-pill" id="status-pill">
+                <span class="status-dot"></span>
+                <span class="status-label">Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- MAIN                                                              -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- ─── KPI Cards ─────────────────────────────────────────────── -->
+        <section class="kpi-row" id="kpi-row" aria-label="Metricas principales">
+            <article class="kpi-card">
+                <span class="kpi-label">Facturas procesadas</span>
+                <span class="kpi-value" id="kpi-total">—</span>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-label">Importe total</span>
+                <span class="kpi-value kpi-accent" id="kpi-importe">—</span>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-label">Importe medio</span>
+                <span class="kpi-value" id="kpi-media">—</span>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-label">Proveedores</span>
+                <span class="kpi-value" id="kpi-proveedores">—</span>
+            </article>
+        </section>
+
+        <!-- ─── Charts ────────────────────────────────────────────────── -->
+        <section class="charts-row" aria-label="Graficos">
+            <div class="chart-card">
+                <h2 class="chart-title" style="text-wrap: balance">Gasto mensual</h2>
+                <div class="chart-container">
+                    <canvas id="chart-mensual"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2 class="chart-title" style="text-wrap: balance">Por proveedor</h2>
+                <div class="chart-container">
+                    <canvas id="chart-proveedores"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── Upload ────────────────────────────────────────────────── -->
+        <section class="upload-card" aria-label="Subir factura">
+            <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Arrastra un PDF o haz clic para seleccionar">
+                <div class="drop-zone-inner" id="drop-zone-inner">
+                    <svg class="drop-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p class="drop-text">Arrastra tu factura PDF</p>
+                    <p class="drop-hint">o haz clic para seleccionar</p>
+                </div>
+                <input type="file" id="file-input" accept=".pdf" hidden>
+            </div>
+
+            <!-- File preview -->
+            <div class="file-pill" id="file-pill" hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span class="file-pill-name" id="file-pill-name"></span>
+                <span class="file-pill-size" id="file-pill-size"></span>
+                <button class="btn-ghost file-pill-remove" id="file-remove" type="button" title="Quitar archivo">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <button class="btn-primary" id="btn-analyze" disabled type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Analizar factura
+            </button>
+        </section>
+
+        <!-- ─── Loading ───────────────────────────────────────────────── -->
+        <section class="loading-bar" id="loading-bar" hidden aria-live="polite">
+            <div class="loading-track"><div class="loading-fill"></div></div>
+            <span class="loading-label">Analizando con IA...</span>
+        </section>
+
+        <!-- ─── Result ────────────────────────────────────────────────── -->
+        <section class="result-card" id="result-card" hidden>
+            <div class="result-header">
+                <h2 class="result-title" style="text-wrap: balance">Datos extraidos</h2>
+                <span class="badge badge-ok">Completado</span>
+            </div>
+            <div class="result-grid" id="result-grid"></div>
+        </section>
+
+        <!-- ─── Error ─────────────────────────────────────────────────── -->
+        <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+        <!-- ─── History ───────────────────────────────────────────────── -->
+        <section class="history-card" aria-label="Historial de facturas">
+            <div class="history-toolbar">
+                <h2 class="history-title" style="text-wrap: balance">Historial</h2>
+                <div class="history-actions">
+                    <div class="search-box">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="search" id="search-input" class="search-input" placeholder="Buscar proveedor...">
+                    </div>
+                    <button class="btn-outline" id="btn-export" type="button" title="Exportar a CSV">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        CSV
+                    </button>
+                    <button class="btn-outline" id="btn-refresh" type="button" title="Actualizar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table" id="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Proveedor</th>
+                            <th>CIF/NIF</th>
+                            <th>N. Factura</th>
+                            <th>Fecha</th>
+                            <th>Importe</th>
+                            <th>Procesado</th>
+                            <th class="th-actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+                <div class="empty-state" id="empty-state">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <p>Sin facturas todavia</p>
+                    <p class="empty-hint">Sube tu primer PDF para empezar</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- DELETE DIALOG (native <dialog>)                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <dialog class="confirm-dialog" id="delete-dialog">
+        <div class="dialog-body">
+            <svg class="dialog-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <h3 class="dialog-title">Eliminar factura</h3>
+            <p class="dialog-text" id="dialog-text">¿Seguro que quieres eliminar esta factura? Esta accion no se puede deshacer.</p>
+            <div class="dialog-actions">
+                <button class="btn-outline" id="dialog-cancel" type="button">Cancelar</button>
+                <button class="btn-danger" id="dialog-confirm" type="button">Eliminar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- FOOTER                                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <footer class="footer">
+        <p>Factura<strong>AI</strong> v2.0 &mdash; Python + FastAPI + OpenAI</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
