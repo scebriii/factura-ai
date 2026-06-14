@@ -4,7 +4,7 @@ A REST API that receives a PDF invoice, extracts structured data using OpenAI GP
 
 Built as a learning project: Python + FastAPI + OpenAI, zero frameworks on the frontend.
 
-<video src="demo%20prueba.mp4" width="100%" controls></video>
+![Demo de FacturaAI](demo.gif)
 
 ---
 
